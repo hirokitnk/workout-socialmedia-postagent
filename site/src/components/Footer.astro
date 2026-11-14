@@ -1,0 +1,56 @@
+---
+import { club, nav } from '../config';
+const socials = [
+  { label: 'Instagram', href: club.social.instagram },
+  { label: 'Strava', href: club.social.strava },
+  { label: 'X', href: club.social.x },
+].filter((s) => s.href);
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="container inner">
+    <div>
+      <p class="name">{club.name}</p>
+      <p class="meta">{club.area}を拠点に活動するランニングクラブ</p>
+      <p class="meta"><a href={`mailto:${club.email}`}>{club.email}</a></p>
+    </div>
+    <ul>
+      {nav.map((item) => <li><a href={item.href}>{item.label}</a></li>)}
+      {socials.map((s) => <li><a href={s.href} rel="noopener" target="_blank">{s.label}</a></li>)}
+    </ul>
+  </div>
+  <div class="container copy">© {club.foundingYear === year ? year : `${club.foundingYear}–${year}`} {club.name}</div>
+</footer>
+
+<style>
+  .site-footer {
+    border-top: 1px solid var(--line);
+    padding-block: 40px 28px;
+    font-size: 0.9rem;
+  }
+  .inner {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 24px;
+  }
+  .name {
+    font-family: var(--font-serif);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    margin: 0 0 0.3em;
+  }
+  .meta { color: var(--muted); margin: 0; }
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 20px;
+  }
+  ul a { color: var(--muted); text-decoration: none; }
+  ul a:hover { color: var(--ink); }
+  .copy { margin-top: 28px; color: var(--muted); font-size: 0.8rem; }
+</style>

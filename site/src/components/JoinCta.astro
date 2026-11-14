@@ -1,0 +1,22 @@
+---
+import { club } from '../config';
+---
+
+<section class="section cta">
+  <div class="container inner">
+    <span class="eyebrow">Join us</span>
+    <h2>まずは一度、一緒に走ってみませんか。</h2>
+    <p class="lead">体験参加は2回まで無料です。走るのが久しぶりの方も、ひとりで参加される方も歓迎します。</p>
+    <div class="actions">
+      <a class="btn" href="/join">体験参加について</a>
+      {club.social.instagram && <a class="btn ghost" href={club.social.instagram} target="_blank" rel="noopener">Instagram を見る</a>}
+    </div>
+  </div>
+</section>
+
+<style>
+  .cta { background: var(--accent-soft); text-align: center; }
+  .inner { display: flex; flex-direction: column; align-items: center; }
+  .lead { margin-inline: auto; }
+  .actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+</style>

@@ -1,0 +1,149 @@
+---
+import Base from '../layouts/Base.astro';
+import EventList from '../components/EventList.astro';
+import ReportCard from '../components/ReportCard.astro';
+import JoinCta from '../components/JoinCta.astro';
+import { club, regularSessions } from '../config';
+import { getReports } from '../lib/reports';
+import { organizationLd, eventsLd } from '../lib/schema';
+
+const site = Astro.site!;
+const reports = (await getReports()).slice(0, 3);
+
+const values = [
+  {
+    title: '自分のペースで',
+    body: 'ペースごとにグループを分けて走ります。速さを競うのではなく、気持ちよく走り切ることを大切にしています。',
+  },
+  {
+    title: '呼吸をととのえる',
+    body: '走る前後に、呼吸と身体に意識を向ける短い時間を取ります。走り終えたあと、頭がすっと静かになる感覚を味わってください。',
+  },
+  {
+    title: 'ゆるやかなつながり',
+    body: '来られる日に来て、走りたい分だけ走る。ほどよい距離感で、続けられる仲間がいる場所をつくっています。',
+  },
+];
+---
+
+<Base jsonLd={[organizationLd(site), ...eventsLd(site)]}>
+  <section class="hero">
+    <svg class="enso" viewBox="0 0 64 64" aria-hidden="true">
+      <path d="M50 30a19 19 0 1 1-9.5-16.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"></path>
+    </svg>
+    <div class="container inner">
+      <span class="eyebrow">{club.area} / Running Club</span>
+      <h1>{club.tagline}</h1>
+      <p class="lead">
+        {club.name}は、{club.area}で活動するランニングクラブです。<br class="pc" />
+        初心者から経験者まで、それぞれのペースで走り、走ったあとの静かな時間を一緒に楽しんでいます。
+      </p>
+      <div class="actions">
+        <a class="btn" href="/join">体験参加する</a>
+        <a class="btn ghost" href="/about">活動案内を見る</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <span class="eyebrow">Our way</span>
+      <h2>大切にしていること</h2>
+      <div class="grid cols-3">
+        {
+          values.map((v, i) => (
+            <div class="card">
+              <p class="num">0{i + 1}</p>
+              <h3>{v.title}</h3>
+              <p class="muted">{v.body}</p>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <span class="eyebrow">Schedule</span>
+      <h2>定例練習</h2>
+      <div class="grid cols-2">
+        {
+          regularSessions.map((s) => (
+            <div class="card">
+              <h3>{s.title}</h3>
+              <dl class="dl">
+                <dt>日時</dt>
+                <dd>
+                  {s.day} {s.time}
+                </dd>
+                <dt>集合</dt>
+                <dd>{s.place}</dd>
+                <dt>距離</dt>
+                <dd>{s.distance}</dd>
+              </dl>
+            </div>
+          ))
+        }
+      </div>
+      <p class="more"><a href="/about">料金・持ち物・よくある質問 →</a></p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <span class="eyebrow">Upcoming</span>
+      <h2>次回の開催予定</h2>
+      <EventList />
+    </div>
+  </section>
+
+  {
+    reports.length > 0 && (
+      <section class="section">
+        <div class="container">
+          <span class="eyebrow">Reports</span>
+          <h2>活動レポート</h2>
+          <div class="grid cols-3">
+            {reports.map((r) => (
+              <ReportCard report={r} />
+            ))}
+          </div>
+          <p class="more">
+            <a href="/reports">すべてのレポート →</a>
+          </p>
+        </div>
+      </section>
+    )
+  }
+
+  <JoinCta />
+</Base>
+
+<style>
+  .hero {
+    position: relative;
+    overflow: hidden;
+    padding-block: clamp(72px, 14vw, 160px);
+  }
+  .enso {
+    position: absolute;
+    right: -8%;
+    top: 50%;
+    width: min(70vw, 560px);
+    transform: translateY(-50%) rotate(-12deg);
+    color: var(--accent);
+    opacity: 0.14;
+    pointer-events: none;
+  }
+  .inner { position: relative; }
+  .hero h1 { max-width: 16em; }
+  .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 8px; }
+  .num { font-family: var(--font-serif); color: var(--accent); margin-bottom: 0.2em; letter-spacing: 0.1em; }
+  .muted { color: var(--muted); margin: 0; font-size: 0.95rem; }
+  .more { margin: 24px 0 0; }
+  @media (max-width: 720px) {
+    .pc { display: none; }
+    .enso { opacity: 0.08; right: -30%; }
+  }
+</style>

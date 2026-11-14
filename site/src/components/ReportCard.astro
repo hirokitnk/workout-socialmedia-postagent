@@ -1,0 +1,37 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { formatDate, isoDate } from '../lib/format';
+
+interface Props {
+  report: CollectionEntry<'reports'>;
+}
+const { report } = Astro.props;
+const { title, date, description, distanceKm, participants, draft } = report.data;
+---
+
+<article class="card report">
+  <p class="meta">
+    <time datetime={isoDate(date)}>{formatDate(date)}</time>
+    {draft && <span class="tag">下書き</span>}
+  </p>
+  <h3><a href={`/reports/${report.id}`}>{title}</a></h3>
+  <p class="desc">{description}</p>
+  {
+    (distanceKm || participants) && (
+      <p class="stats">
+        {distanceKm && <span>{distanceKm} km</span>}
+        {participants && <span>{participants} 名参加</span>}
+      </p>
+    )
+  }
+</article>
+
+<style>
+  .report { display: flex; flex-direction: column; }
+  .meta { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 0.85rem; margin-bottom: 0.4em; }
+  h3 { margin-bottom: 0.4em; }
+  h3 a { color: var(--ink); text-decoration: none; }
+  h3 a:hover { text-decoration: underline; }
+  .desc { color: var(--muted); font-size: 0.95rem; flex: 1; }
+  .stats { display: flex; gap: 16px; font-size: 0.85rem; margin: 0; color: var(--accent); }
+</style>

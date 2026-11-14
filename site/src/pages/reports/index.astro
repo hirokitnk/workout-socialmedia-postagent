@@ -1,0 +1,42 @@
+---
+import Base from '../../layouts/Base.astro';
+import ReportCard from '../../components/ReportCard.astro';
+import { club } from '../../config';
+import { getReports } from '../../lib/reports';
+import { breadcrumbLd } from '../../lib/schema';
+
+const site = Astro.site!;
+const reports = await getReports();
+---
+
+<Base
+  title="活動レポート"
+  description={`${club.name}の練習の様子をお届けします。${club.area}周辺のランニングコースや、季節ごとの練習の記録です。`}
+  jsonLd={breadcrumbLd(site, [
+    { name: 'ホーム', path: '/' },
+    { name: '活動レポート', path: '/reports' },
+  ])}
+>
+  <section class="section">
+    <div class="container">
+      <span class="eyebrow">Reports</span>
+      <h1>活動レポート</h1>
+      <p class="lead">毎回の練習の様子を記録しています。雰囲気を知りたい方は、ぜひのぞいてみてください。</p>
+      {
+        reports.length ? (
+          <div class="grid cols-3 list">
+            {reports.map((r) => (
+              <ReportCard report={r} />
+            ))}
+          </div>
+        ) : (
+          <p>まだレポートはありません。</p>
+        )
+      }
+    </div>
+  </section>
+</Base>
+
+<style>
+  .list { margin-top: 32px; }
+</style>

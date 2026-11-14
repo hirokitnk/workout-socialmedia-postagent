@@ -1,0 +1,124 @@
+---
+import Base from '../layouts/Base.astro';
+import JoinCta from '../components/JoinCta.astro';
+import EventList from '../components/EventList.astro';
+import { club, regularSessions, fees, faqs } from '../config';
+import { breadcrumbLd, eventsLd } from '../lib/schema';
+
+const site = Astro.site!;
+---
+
+<Base
+  title="活動案内"
+  description={`${club.name}の定例練習の日時・集合場所・ペース、料金、持ち物、よくある質問。${club.area}でランニング仲間を探している方へ。`}
+  jsonLd={[
+    breadcrumbLd(site, [
+      { name: 'ホーム', path: '/' },
+      { name: '活動案内', path: '/about' },
+    ]),
+    ...eventsLd(site),
+  ]}
+>
+  <section class="section">
+    <div class="container">
+      <span class="eyebrow">About</span>
+      <h1>活動案内</h1>
+      <p class="lead">
+        {club.area}を拠点に、週2回の定例練習を行っています。どの回からでも、ひとりでも参加できます。
+      </p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <h2>定例練習</h2>
+      <div class="grid cols-2">
+        {
+          regularSessions.map((s) => (
+            <div class="card">
+              <h3>{s.title}</h3>
+              <dl class="dl">
+                <dt>日時</dt>
+                <dd>{s.day} {s.time}</dd>
+                <dt>集合</dt>
+                <dd>{s.place}</dd>
+                <dt>距離</dt>
+                <dd>{s.distance}</dd>
+                <dt>ペース</dt>
+                <dd>{s.pace}</dd>
+              </dl>
+              <p class="note">{s.note}</p>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <h2>集合場所</h2>
+      <div class="card">
+        <dl class="dl">
+          <dt>場所</dt>
+          <dd>{club.meetingPoint.name}</dd>
+          <dt>住所</dt>
+          <dd>{club.meetingPoint.address}</dd>
+        </dl>
+        <p class="map"><a href={club.meetingPoint.mapUrl} target="_blank" rel="noopener">Googleマップで開く →</a></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <h2>次回の開催予定</h2>
+      <EventList limit={5} />
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <h2>料金</h2>
+      <div class="card">
+        <dl class="dl fees">
+          {
+            fees.map((f) => (
+              <>
+                <dt>{f.label}</dt>
+                <dd>{f.price}</dd>
+              </>
+            ))
+          }
+        </dl>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <h2>よくある質問</h2>
+      <div class="faq">
+        {
+          faqs.map((f) => (
+            <details class="card">
+              <summary>{f.q}</summary>
+              <p>{f.a}</p>
+            </details>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <JoinCta />
+</Base>
+
+<style>
+  .note { color: var(--muted); font-size: 0.9rem; margin: 1em 0 0; }
+  .map { margin: 1em 0 0; }
+  .fees { grid-template-columns: 9em 1fr; }
+  .faq { display: grid; gap: 12px; }
+  summary { cursor: pointer; font-weight: 600; }
+  details p { margin: 0.8em 0 0; color: var(--muted); }
+</style>

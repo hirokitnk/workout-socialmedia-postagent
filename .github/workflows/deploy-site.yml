@@ -1,0 +1,43 @@
+name: Deploy site
+
+on:
+  push:
+    branches: [main]
+    paths: ['site/**', 'firebase.json', '.firebaserc', '.github/workflows/deploy-site.yml']
+  pull_request:
+    paths: ['site/**', 'firebase.json']
+  # 終了した開催予定を消すため、毎朝ビルドし直す（日本時間 5:17）
+  schedule:
+    - cron: '17 20 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  checks: write
+  pull-requests: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: site/package-lock.json
+
+      - name: Build
+        working-directory: site
+        run: |
+          npm ci
+          npm run build
+
+      # PRではプレビューURLを発行し、mainへのpushと定期実行では本番に反映する
+      - uses: FirebaseExtended/action-hosting-deploy@v0
+        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          channelId: ${{ github.event_name == 'pull_request' && '' || 'live' }}

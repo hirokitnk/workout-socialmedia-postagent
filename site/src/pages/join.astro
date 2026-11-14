@@ -1,0 +1,90 @@
+---
+import Base from '../layouts/Base.astro';
+import EventList from '../components/EventList.astro';
+import { club } from '../config';
+import { breadcrumbLd } from '../lib/schema';
+
+const site = Astro.site!;
+const steps = [
+  { title: 'フォームから申し込む', body: '参加したい日と、普段どのくらい走っているかを教えてください。1分ほどで終わります。' },
+  { title: '確認のメールを受け取る', body: '2日以内に、集合場所の詳しい案内と当日の連絡先をお送りします。' },
+  { title: '当日、集合場所へ', body: '開始10分前を目安にお越しください。ペースに合わせてグループを決めてから走り始めます。' },
+];
+---
+
+<Base
+  title="体験参加"
+  description={`${club.name}の体験参加は2回まで無料。${club.area}で初心者歓迎のランニングクラブを探している方は、お気軽にお申し込みください。`}
+  jsonLd={breadcrumbLd(site, [
+    { name: 'ホーム', path: '/' },
+    { name: '体験参加', path: '/join' },
+  ])}
+>
+  <section class="section">
+    <div class="container">
+      <span class="eyebrow">Join</span>
+      <h1>体験参加</h1>
+      <p class="lead">
+        体験参加は2回まで無料です。走るのが久しぶりの方、ひとりで参加される方がほとんどなので、気軽にお越しください。
+      </p>
+      {
+        club.joinFormUrl ? (
+          <a class="btn" href={club.joinFormUrl} target="_blank" rel="noopener">
+            申し込みフォームを開く
+          </a>
+        ) : (
+          <a class="btn" aria-disabled="true">
+            申し込みフォーム準備中
+          </a>
+        )
+      }
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <h2>参加までの流れ</h2>
+      <ol class="steps">
+        {
+          steps.map((s, i) => (
+            <li class="card">
+              <span class="num">STEP {i + 1}</span>
+              <h3>{s.title}</h3>
+              <p>{s.body}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <h2>次回の開催予定</h2>
+      <EventList limit={5} />
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <h2>お問い合わせ</h2>
+      <p>
+        フォーム以外でのご質問は <a href={`mailto:${club.email}`}>{club.email}</a> までどうぞ。
+        {club.social.instagram && (
+          <>
+            InstagramのDMでも受け付けています（<a href={club.social.instagram} target="_blank" rel="noopener">Instagram</a>）。
+          </>
+        )}
+      </p>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 16px; }
+  @media (min-width: 720px) {
+    .steps { grid-template-columns: repeat(3, 1fr); }
+  }
+  .num { display: block; font-size: 0.78rem; letter-spacing: 0.2em; color: var(--accent); margin-bottom: 0.4em; }
+  .steps p { color: var(--muted); font-size: 0.95rem; margin: 0; }
+</style>

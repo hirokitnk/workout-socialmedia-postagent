@@ -1,0 +1,54 @@
+---
+import { futureEvents } from '../lib/schema';
+import { formatDate, formatTime } from '../lib/format';
+import { club } from '../config';
+
+interface Props {
+  limit?: number;
+}
+const { limit = 3 } = Astro.props;
+const events = futureEvents().slice(0, limit);
+---
+
+{
+  events.length ? (
+    <ul class="events">
+      {events.map((e) => {
+        const start = new Date(e.start);
+        const end = new Date(e.end);
+        return (
+          <li class="card event">
+            <time datetime={e.start} class="date">
+              <span class="day">{formatDate(start)}</span>
+              <span class="time">
+                {formatTime(start)} – {formatTime(end)}
+              </span>
+            </time>
+            <div>
+              <h3>{e.title}</h3>
+              <p>{e.description}</p>
+              <p class="place">集合：{club.meetingPoint.name}</p>
+            </div>
+          </li>
+        );
+      })}
+    </ul>
+  ) : (
+    <p class="empty">次回の予定は準備中です。Instagramでもお知らせしています。</p>
+  )
+}
+
+<style>
+  .events { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+  .event { display: grid; gap: 8px 24px; }
+  @media (min-width: 640px) {
+    .event { grid-template-columns: 12em 1fr; }
+  }
+  .date { display: flex; flex-direction: column; }
+  .day { font-family: var(--font-serif); font-weight: 600; }
+  .time { color: var(--muted); font-size: 0.9rem; }
+  h3 { margin-bottom: 0.2em; }
+  p { margin: 0; color: var(--muted); font-size: 0.95rem; }
+  .place { margin-top: 0.4em; font-size: 0.85rem; }
+  .empty { color: var(--muted); }
+</style>

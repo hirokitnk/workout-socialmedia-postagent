@@ -1,0 +1,74 @@
+---
+import { render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import JoinCta from '../../components/JoinCta.astro';
+import { getReports } from '../../lib/reports';
+import { formatDate, isoDate } from '../../lib/format';
+import { articleLd, breadcrumbLd } from '../../lib/schema';
+
+export async function getStaticPaths() {
+  const reports = await getReports();
+  return reports.map((report) => ({ params: { id: report.id }, props: { report } }));
+}
+
+const { report } = Astro.props;
+const { Content } = await render(report);
+const { title, description, date, location, distanceKm, participants, tags, draft } = report.data;
+const site = Astro.site!;
+const url = new URL(Astro.url.pathname, site);
+---
+
+<Base
+  title={title}
+  description={description}
+  ogType="article"
+  jsonLd={[
+    articleLd(site, url, report.data),
+    breadcrumbLd(site, [
+      { name: 'ホーム', path: '/' },
+      { name: '活動レポート', path: '/reports' },
+      { name: title, path: Astro.url.pathname },
+    ]),
+  ]}
+>
+  <article class="section">
+    <div class="container narrow">
+      <p class="crumbs"><a href="/reports">活動レポート</a></p>
+      <h1>{title}</h1>
+      <p class="meta">
+        <time datetime={isoDate(date)}>{formatDate(date)}</time>
+        {draft && <span class="tag">下書き（本番には出ません）</span>}
+      </p>
+      {
+        (location || distanceKm || participants) && (
+          <dl class="dl card stats">
+            {location && (<><dt>場所</dt><dd>{location}</dd></>)}
+            {distanceKm && (<><dt>距離</dt><dd>{distanceKm} km</dd></>)}
+            {participants && (<><dt>参加者</dt><dd>{participants} 名</dd></>)}
+          </dl>
+        )
+      }
+      <div class="prose">
+        <Content />
+      </div>
+      {tags.length > 0 && <p class="tags">{tags.map((t) => <span class="tag">{t}</span>)}</p>}
+    </div>
+  </article>
+  <JoinCta />
+</Base>
+
+<style>
+  .narrow { max-width: 720px; }
+  .crumbs { font-size: 0.85rem; margin-bottom: 1em; }
+  .meta { display: flex; align-items: center; gap: 10px; color: var(--muted); }
+  .stats { margin: 0 0 2em; }
+  .prose :global(h2) { margin-top: 2em; font-size: 1.35rem; }
+  .prose :global(img) { border-radius: var(--radius); }
+  .prose :global(blockquote) {
+    margin: 1.5em 0;
+    padding-left: 1em;
+    border-left: 3px solid var(--line);
+    color: var(--muted);
+  }
+  .tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 2em; }
+</style>
